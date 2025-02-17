@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import status
 from books.models import Book
 from .serializers import BookSerializer
 
@@ -21,10 +22,12 @@ def add_book(request):
 def delete_book(request,book_id):
     try:
         book = Book.objects.get(id=book_id)
+        book.delete()
+        return Response({'message': 'Book deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     except Book.DoesNotExist:
         return Response({"error": "Book not found"}, status=status.HTTP_404_NOT_Found)
+    except Exception as error:
+        return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    book.delete()
-    return Response({'message': 'Book deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
     
 
